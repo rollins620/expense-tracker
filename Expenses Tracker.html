@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExpenseFlow | Smart Financial Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="login-page" class="login-page">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>ExpenseFlow</h1>
+                <p>Precision in Spending, Confidence in Saving</p>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="login-form" class="login-form">
+                <div class="form-group">
+                    <label for="login-email">Email Address</label>
+                    <input type="email" id="login-email" placeholder="Enter your email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="Enter your password" required>
+                </div>
+                
+                <div class="form-options">
+                    <label class="checkbox">
+                        <input type="checkbox" id="remember-me">
+                        <span class="checkmark"></span>
+                        Remember me
+                    </label>
+                    <a href="#" class="forgot-password" onclick="showForgotPassword()">Forgot Password?</a>
+                </div>
+                
+                <button type="submit" class="login-btn">Sign In</button>
+                
+                <div class="divider">
+                    <span>or</span>
+                </div>
+                
+                <button type="button" class="btn-secondary" onclick="showRegister()">
+                    Create New Account
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Registration Modal -->
+    <div id="register-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create Account</h2>
+                <button class="modal-close" onclick="closeModal('register-modal')">&times;</button>
+            </div>
+            <form id="register-form" class="modal-form">
+                <div class="form-group">
+                    <label for="register-name">Full Name</label>
+                    <input type="text" id="register-name" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-email">Email Address</label>
+                    <input type="email" id="register-email" placeholder="Enter your email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-password">Password</label>
+                    <input type="password" id="register-password" placeholder="Create a password" required minlength="6">
+                    <div class="password-strength">
+                        <div class="strength-bar"></div>
+                        <div class="strength-bar"></div>
+                        <div class="strength-bar"></div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-confirm-password">Confirm Password</label>
+                    <input type="password" id="register-confirm-password" placeholder="Confirm your password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox">
+                        <input type="checkbox" id="accept-terms" required>
+                        <span class="checkmark"></span>
+                        I agree to the <a href="#" class="terms-link">Terms & Conditions</a>
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn-primary">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgot-password-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Reset Password</h2>
+                <button class="modal-close" onclick="closeModal('forgot-password-modal')">&times;</button>
+            </div>
+            <form id="forgot-password-form" class="modal-form">
+                <div class="form-group">
+                    <label for="reset-email">Email Address</label>
+                    <input type="email" id="reset-email" placeholder="Enter your email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reset-code">Verification Code (Sent to Email)</label>
+                    <input type="text" id="reset-code" placeholder="Enter 6-digit code" maxlength="6">
+                </div>
+                
+                <div class="form-group">
+                    <label for="new-password">New Password</label>
+                    <input type="password" id="new-password" placeholder="Enter new password" minlength="6">
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirm-new-password">Confirm New Password</label>
+                    <input type="password" id="confirm-new-password" placeholder="Confirm new password">
+                </div>
+                
+                <button type="button" class="btn-secondary" id="send-code-btn" onclick="sendVerificationCode()">
+                    Send Verification Code
+                </button>
+                
+                <button type="submit" class="btn-primary" id="reset-password-btn" disabled>
+                    Reset Password
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app-page" class="app-page">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>ExpenseFlow</h1>
+                    <p class="tagline">Professional Financial Management System</p>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <span id="user-initials">U</span>
+                    </div>
+                    <div class="user-details">
+                        <span id="current-user">Welcome, User</span>
+                        <span class="user-email" id="user-email">user@example.com</span>
+                    </div>
+                    <div class="user-menu">
+                        <button class="logout-btn" onclick="logout()">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-container">
+            <!-- Summary Dashboard -->
+            <section class="section">
+                <h2 class="section-header">Financial Dashboard</h2>
+                <div class="summary-dashboard">
+                    <div class="summary-card income">
+                        <h3>Monthly Income</h3>
+                        <div class="amount" id="summary-income">KES0.00</div>
+                        <p class="text-muted">Total monthly earnings</p>
+                    </div>
+                    
+                    <div class="summary-card expenses">
+                        <h3>Monthly Expenses</h3>
+                        <div class="amount" id="summary-expenses">KES0.00</div>
+                        <p class="text-muted">Total monthly spending</p>
+                    </div>
+                    
+                    <div class="summary-card savings">
+                        <h3>Total Savings</h3>
+                        <div class="amount" id="summary-savings">KES0.00</div>
+                        <p class="text-muted">Accumulated savings</p>
+                    </div>
+                    
+                    <div class="summary-card balance">
+                        <h3>Net Balance</h3>
+                        <div class="amount" id="summary-balance">KES0.00</div>
+                        <p class="text-muted">After expenses & savings</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Input Sections -->
+            <div class="sections-grid">
+                <!-- Income Section -->
+                <section class="section">
+                    <h2 class="section-header">Income Management</h2>
+                    <div class="input-group">
+                        <input type="number" id="income-input" placeholder="Income Amount" step="0.01">
+                        <button class="btn btn-primary" onclick="addIncome()">Add Income</button>
+                    </div>
+                    <div class="history-section">
+                        <h4>Income History</h4>
+                        <div id="income-history" class="mt-20"></div>
+                    </div>
+                </section>
+
+                <!-- Expenses Section -->
+                <section class="section">
+                    <h2 class="section-header">Expense Tracking</h2>
+                    <div class="input-group">
+                        <input type="text" id="name-input" placeholder="Expense Name">
+                        <input type="number" id="amount-input" placeholder="Amount" step="0.01">
+                        <input type="date" id="date-input">
+                        <input type="time" id="time-input">
+                        <select id="category-input">
+                            <option value="">Select Category</option>
+                            <option value="food">Food & Dining</option>
+                            <option value="transport">Transportation</option>
+                            <option value="shopping">Shopping</option>
+                            <option value="entertainment">Entertainment</option>
+                            <option value="bills">Bills & Utilities</option>
+                            <option value="health">Health & Fitness</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="addExpense()">Add Expense</button>
+                    </div>
+                </section>
+
+                <!-- Savings Section -->
+                <section class="section">
+                    <h2 class="section-header">Savings Management</h2>
+                    <div class="input-group">
+                        <input type="number" id="savings-input" placeholder="Amount" step="0.01">
+                        <button class="btn btn-success" onclick="addToSavings()">Add to Savings</button>
+                        <button class="btn btn-danger" onclick="withdrawFromSavings()">Withdraw</button>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Expenses Table -->
+            <section class="section">
+                <h2 class="section-header">Recent Expenses</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Category</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expenses-table-body">
+                            <tr>
+                                <td colspan="6" class="text-center">No expenses added yet</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Analytics Section -->
+            <section class="section">
+                <h2 class="section-header">Financial Analytics</h2>
+                <div class="analytics-grid">
+                    <div class="chart-container">
+                        <h3>Expense Distribution</h3>
+                        <canvas id="expenseDistributionChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Monthly Trends</h3>
+                        <canvas id="monthlyTrendsChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Savings Progress</h3>
+                        <canvas id="savingsProgressChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Insights Section -->
+            <section class="section">
+                <h2 class="section-header">AI Financial Insights</h2>
+                <div class="insights-grid">
+                    <div class="insight-card">
+                        <h4>Top Recommendation</h4>
+                        <p id="top-insight">Add your first transaction to receive personalized insights.</p>
+                        <div class="insight-metrics">
+                            <div class="metric">
+                                <span class="value" id="avg-daily">KES0.00</span>
+                                <span class="label">Avg Daily</span>
+                            </div>
+                            <div class="metric">
+                                <span class="value" id="peak-category">None</span>
+                                <span class="label">Peak Category</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="insight-card">
+                        <h4>Savings Potential</h4>
+                        <p id="savings-advice">Start saving to receive optimization advice.</p>
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="savings-progress" style="width: 0%"></div>
+                            </div>
+                            <div class="text-center mt-10">
+                                <span id="savings-percentage">0%</span> of goal
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="insight-card">
+                        <h4>Quick Savings Goal</h4>
+                        <p>Update your savings goal anytime</p>
+                        <div class="input-group" style="margin-top: 15px; display: flex; gap: 10px;">
+                            <input type="number" id="quick-savings-goal" placeholder="New savings goal" min="0" step="100" style="flex: 2;">
+                            <button class="btn btn-primary" onclick="quickUpdateSavingsGoal()" style="flex: 1; padding: 10px;">Update</button>
+                        </div>
+                    </div>
+                    
+                    <div class="insight-card">
+                        <h4>Category Analysis</h4>
+                        <p id="category-insight">No category data available yet.</p>
+                        <div class="category-tags" id="category-tags">
+                            <span class="category-tag">Add expenses to see categories</span>
+                        </div>
+                    </div>
+                    
+                    <div class="insight-card">
+                        <h4>Monthly Forecast</h4>
+                        <p id="monthly-forecast">Add income and expenses for forecasting.</p>
+                        <div class="insight-metrics">
+                            <div class="metric">
+                                <span class="value" id="projected-balance">KES0.00</span>
+                                <span class="label">Projected Balance</span>
+                            </div>
+                            <div class="metric">
+                                <span class="value" id="risk-level">Low</span>
+                                <span class="label">Risk Level</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-30">
+                    <button class="btn btn-primary" onclick="generateAIInsights()">
+                        Generate New Insights
+                    </button>
+                </div>
+            </section>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="reset-btn export" onclick="downloadPDFReport()">
+                    Export PDF Report
+                </button>
+                <button class="reset-btn reset" onclick="resetAllData()">
+                    Reset All Data
+                </button>
+                <button class="reset-btn settings" onclick="showUserSettings()">
+                    User Settings
+                </button>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <div class="footer-content">
+                <p>ExpenseFlow Professional Financial Tracker</p>
+                <p>© 2024 All Rights Reserved | Data stored locally in your browser</p>
+                <p class="mt-20">Version 3.0.0 | Times New Roman Font Style</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- User Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>User Settings</h2>
+                <button class="modal-close" onclick="closeModal('settings-modal')">&times;</button>
+            </div>
+            <form id="settings-form" class="modal-form">
+                <div class="form-group">
+                    <label for="settings-name">Full Name</label>
+                    <input type="text" id="settings-name" placeholder="Your full name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="settings-email">Email Address</label>
+                    <input type="email" id="settings-email" placeholder="Your email" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label for="settings-savings-goal">Monthly Savings Goal (KES)</label>
+                    <input type="number" id="settings-savings-goal" placeholder="Enter your savings goal" min="0" step="100">
+                </div>
+                
+                <div class="form-group">
+                    <label for="current-password">Current Password</label>
+                    <input type="password" id="current-password" placeholder="Enter current password">
+                </div>
+                
+                <div class="form-group">
+                    <label for="settings-new-password">New Password</label>
+                    <input type="password" id="settings-new-password" placeholder="Enter new password">
+                </div>
+                
+                <div class="form-group">
+                    <label for="settings-confirm-password">Confirm New Password</label>
+                    <input type="password" id="settings-confirm-password" placeholder="Confirm new password">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal('settings-modal')">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
